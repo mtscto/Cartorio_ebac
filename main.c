@@ -40,7 +40,7 @@ int main()
 
         // Título do programa com destaque
         printf(CYAN "######################################\n");
-        printf("###       Cartorio da EBAC        ###\n");
+        printf("###       Cartorio da EBAC         ###\n");
         printf("######################################\n\n" RESET);
 
         // Menu de opções
