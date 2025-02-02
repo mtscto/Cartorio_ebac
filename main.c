@@ -45,8 +45,8 @@ void exibirMenu()
     printf("######################################\n\n" RESET);
 
     printf(GREEN "Escolha a opção desejada no menu:\n\n" RESET);
-    printf(YELLOW "\t1 - Registrar Nomes\n" RESET);
-    printf(YELLOW "\t2 - Consultar Nomes\n" RESET);
-    printf(YELLOW "\t3 - Deletar Nomes\n" RESET);
+    printf(YELLOW "\t1 - Registrar Usuarios\n" RESET);
+    printf(YELLOW "\t2 - Consultar Usuarios\n" RESET);
+    printf(YELLOW "\t3 - Deletar Usuarios\n" RESET);
     printf(YELLOW "\t4 - Sair\n\n" RESET);
 }

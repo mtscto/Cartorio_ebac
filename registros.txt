@@ -1,2 +1,5 @@
-47901981890|Matheus|Tavares|Desenvolvedor Full Stack|23/07/2003
-47901981890|Matheus|Tavares|Desenvolvedor Full Stack|23/07/2003
+14238018737|Gabrielle|Oliveira|CEO|08/04/1999
+11111111111|Donnie|Coutinho|Food tester|12/05/2020
+22222222222|Venom|Coutinho|Professional Sleeper|10/01/2023
+33333333333|Remy|Coutinho|CEO Of Destruction|19/08/2024
+47901981890|Matheus|Tavares|Full Stack Development|23/07/2003
