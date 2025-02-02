@@ -5,8 +5,9 @@
 int main()
 {
     setlocale(LC_ALL, "Portuguese");
-    int opcao;
+    exibirTelaLogin(); // Chama a tela de login antes do menu
 
+    int opcao;
     while (1)
     {
         limparTela();
@@ -17,13 +18,13 @@ int main()
         switch (opcao)
         {
         case 1:
-            registrarNomes();
+            registrarUsuarios();
             break;
         case 2:
-            consultarNomes();
+            consultarUsuarios();
             break;
         case 3:
-            deletarNomes();
+            deletarUsuarios();
             break;
         case 4:
             printf(CYAN "Saindo do programa...\n" RESET);

@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
+
+#define SENHA_ADMIN "admin"
 
 // Função para limpar a tela
 void limparTela()
@@ -13,25 +16,91 @@ void limparTela()
 #endif
 }
 
-// Função para validar continuação
-char validarContinuacao(const char *mensagem)
+// Função de login com senha
+void exibirTelaLogin()
 {
-    char continuar;
-    while (1)
-    {
-        printf("%s (s/n): ", mensagem);
-        scanf(" %c", &continuar);
+    char senha[20];
+    int tentativas = 3;
 
-        if (continuar == 's' || continuar == 'S' || continuar == 'n' || continuar == 'N')
+    while (tentativas > 0)
+    {
+        limparTela();
+        printf(CYAN "######################################\n");
+        printf("###       Cartório da EBAC        ###\n");
+        printf("######################################\n\n" RESET);
+
+        printf(YELLOW "Digite a senha de administrador: " RESET);
+        scanf("%s", senha);
+
+        if (strcmp(senha, SENHA_ADMIN) == 0)
         {
-            return continuar;
+            printf(GREEN "Acesso concedido!\n" RESET);
+            return;
         }
-        printf(RED "Opção inválida! Digite 's' para sim ou 'n' para não.\n" RESET);
+        else
+        {
+            tentativas--;
+            if (tentativas > 0)
+            {
+                printf(RED "Senha incorreta, restam %d tentativa(s).\n" RESET, tentativas);
+                printf(YELLOW "Pressione qualquer tecla para continuar...\n" RESET);
+                getchar();
+                getchar();
+            }
+            else
+            {
+                printf(RED "Senha incorreta, sistema bloqueado.\n" RESET);
+                exit(1);
+            }
+        }
     }
 }
 
-// Função para registrar nomes
-void registrarNomes()
+// Funções de Validação
+int validarCPF(const char *cpf)
+{
+    if (strlen(cpf) != 11)
+        return 0;
+    for (int i = 0; i < 11; i++)
+    {
+        if (!isdigit(cpf[i]))
+            return 0;
+    }
+    return 1;
+}
+
+int validarTexto(const char *texto)
+{
+    for (int i = 0; texto[i] != '\0'; i++)
+    {
+        if (!isalpha(texto[i]) && texto[i] != ' ')
+            return 0;
+    }
+    return 1;
+}
+
+int validarData(const char *data)
+{
+    if (strlen(data) != 8)
+        return 0;
+    for (int i = 0; i < 8; i++)
+    {
+        if (!isdigit(data[i]))
+            return 0;
+    }
+    return 1;
+}
+
+void formatarData(char *data)
+{
+    char formatada[11];
+    snprintf(formatada, sizeof(formatada), "%c%c/%c%c/%c%c%c%c",
+             data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]);
+    strcpy(data, formatada);
+}
+
+// Função para registrar usuários
+void registrarUsuarios()
 {
     char continuar = 's';
     FILE *arquivo;
@@ -39,6 +108,10 @@ void registrarNomes()
     while (continuar == 's' || continuar == 'S')
     {
         limparTela();
+        printf(CYAN "######################################\n");
+        printf("###    Registrar Novo Usuário      ###\n");
+        printf("######################################\n\n" RESET);
+
         arquivo = fopen("registros.txt", "a");
         if (arquivo == NULL)
         {
@@ -46,49 +119,51 @@ void registrarNomes()
             return;
         }
 
-        Registro reg;
+        Usuario usuario;
 
-        printf(CYAN "### Registrar Nomes ###\n" RESET);
-        printf(YELLOW "Digite 'm' a qualquer momento para voltar ao menu.\n\n" RESET);
-
-        printf("Digite o CPF: ");
-        getchar();
-        fgets(reg.cpf, TAM_CPF, stdin);
-        if (strcmp(reg.cpf, "m\n") == 0)
+        do
         {
-            fclose(arquivo);
-            return;
-        }
-        reg.cpf[strcspn(reg.cpf, "\n")] = '\0';
+            printf(YELLOW "Digite o CPF \n(apenas numeros, 11 digitos): " RESET);
+            scanf("%s", usuario.cpf);
+        } while (!validarCPF(usuario.cpf));
 
-        printf("Digite o Nome: ");
-        fgets(reg.nome, TAM_NOME, stdin);
-        if (strcmp(reg.nome, "m\n") == 0)
+        do
         {
-            fclose(arquivo);
-            return;
-        }
-        reg.nome[strcspn(reg.nome, "\n")] = '\0';
+            printf(YELLOW "Digite o Nome \n(apenas letras): " RESET);
+            scanf(" %[^\n]s", usuario.nome);
+        } while (!validarTexto(usuario.nome));
 
-        printf("Digite o Sobrenome: ");
-        fgets(reg.sobrenome, TAM_NOME, stdin);
-        if (strcmp(reg.sobrenome, "m\n") == 0)
+        do
         {
-            fclose(arquivo);
-            return;
-        }
-        reg.sobrenome[strcspn(reg.sobrenome, "\n")] = '\0';
+            printf(YELLOW "Digite o Sobrenome \n(apenas letras): " RESET);
+            scanf(" %[^\n]s", usuario.sobrenome);
+        } while (!validarTexto(usuario.sobrenome));
 
-        fprintf(arquivo, "%s|%s|%s\n", reg.cpf, reg.nome, reg.sobrenome);
+        do
+        {
+            printf(YELLOW "Digite o Cargo \n(apenas letras): " RESET);
+            scanf(" %[^\n]s", usuario.cargo);
+        } while (!validarTexto(usuario.cargo));
+
+        do
+        {
+            printf(YELLOW "Digite a Data de Nascimento (DDMMAAAA)\n(apenas numeros, 11 digitos): " RESET);
+            scanf("%s", usuario.dataNascimento);
+        } while (!validarData(usuario.dataNascimento));
+
+        formatarData(usuario.dataNascimento);
+
+        fprintf(arquivo, "%s|%s|%s|%s|%s\n", usuario.cpf, usuario.nome, usuario.sobrenome, usuario.cargo, usuario.dataNascimento);
         fclose(arquivo);
 
-        printf(GREEN "\nRegistro salvo com sucesso!\n" RESET);
-        continuar = validarContinuacao("Deseja registrar outro nome?");
+        printf(GREEN "\nUsuário registrado com sucesso!\n" RESET);
+        printf(YELLOW "Deseja registrar outro usuário? (s/n): " RESET);
+        scanf(" %c", &continuar);
     }
 }
 
-// Função para consultar nomes
-void consultarNomes()
+// Função para consultar usuários
+void consultarUsuarios()
 {
     FILE *arquivo = fopen("registros.txt", "r");
     if (arquivo == NULL)
@@ -98,15 +173,16 @@ void consultarNomes()
     }
 
     limparTela();
-    Registro reg;
+    Usuario usuario;
     int contador = 0;
 
-    printf(CYAN "### Consultar Nomes ###\n" RESET);
-    printf(YELLOW "Digite 'm' a qualquer momento para voltar ao menu.\n\n" RESET);
+    printf(CYAN "### Consultar Usuários ###\n\n" RESET);
 
-    while (fscanf(arquivo, "%[^|]|%[^|]|%[^\n]\n", reg.cpf, reg.nome, reg.sobrenome) != EOF)
+    while (fscanf(arquivo, "%[^|]|%[^|]|%[^|]|%[^|]|%[^\n]\n",
+                  usuario.cpf, usuario.nome, usuario.sobrenome, usuario.cargo, usuario.dataNascimento) != EOF)
     {
-        printf("%d. CPF: %s | Nome: %s %s\n", ++contador, reg.cpf, reg.nome, reg.sobrenome);
+        printf("%d. CPF: %s | Nome: %s %s | Cargo: %s | Nascimento: %s\n",
+               ++contador, usuario.cpf, usuario.nome, usuario.sobrenome, usuario.cargo, usuario.dataNascimento);
     }
 
     if (contador == 0)
@@ -115,11 +191,13 @@ void consultarNomes()
     }
 
     fclose(arquivo);
-    system("pause");
+    printf(YELLOW "\nPressione qualquer tecla para continuar...\n" RESET);
+    getchar();
+    getchar();
 }
 
-// Função para deletar registros
-void deletarNomes()
+// Função para deletar usuários
+void deletarUsuarios()
 {
     char cpfExcluir[TAM_CPF];
     FILE *arquivo = fopen("registros.txt", "r");
@@ -132,28 +210,20 @@ void deletarNomes()
     }
 
     limparTela();
-    printf(CYAN "### Deletar Nomes ###\n" RESET);
-    printf(YELLOW "Digite 'm' a qualquer momento para voltar ao menu.\n\n" RESET);
-
-    printf("Digite o CPF do registro a ser deletado: ");
+    printf(CYAN "### Deletar Usuário ###\n\n" RESET);
+    printf(YELLOW "Digite o CPF do usuário a ser deletado: " RESET);
     scanf("%s", cpfExcluir);
 
-    Registro reg;
+    Usuario usuario;
     int encontrado = 0;
 
-    while (fscanf(arquivo, "%[^|]|%[^|]|%[^\n]\n", reg.cpf, reg.nome, reg.sobrenome) != EOF)
+    while (fscanf(arquivo, "%[^|]|%[^|]|%[^|]|%[^|]|%[^\n]\n",
+                  usuario.cpf, usuario.nome, usuario.sobrenome, usuario.cargo, usuario.dataNascimento) != EOF)
     {
-        if (strcmp(cpfExcluir, "m") == 0)
+        if (strcmp(cpfExcluir, usuario.cpf) != 0)
         {
-            fclose(arquivo);
-            fclose(temp);
-            remove("temp.txt");
-            return;
-        }
-
-        if (strcmp(cpfExcluir, reg.cpf) != 0)
-        {
-            fprintf(temp, "%s|%s|%s\n", reg.cpf, reg.nome, reg.sobrenome);
+            fprintf(temp, "%s|%s|%s|%s|%s\n",
+                    usuario.cpf, usuario.nome, usuario.sobrenome, usuario.cargo, usuario.dataNascimento);
         }
         else
         {
@@ -168,9 +238,11 @@ void deletarNomes()
     rename("temp.txt", "registros.txt");
 
     if (encontrado)
-        printf(GREEN "Registro deletado com sucesso!\n" RESET);
+        printf(GREEN "Usuário deletado com sucesso!\n" RESET);
     else
-        printf(RED "Registro não encontrado.\n" RESET);
+        printf(RED "Usuário não encontrado.\n" RESET);
 
-    system("pause");
+    printf(YELLOW "\nPressione qualquer tecla para continuar...\n" RESET);
+    getchar();
+    getchar();
 }

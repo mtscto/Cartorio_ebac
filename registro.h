@@ -9,13 +9,13 @@
 #define CYAN "\x1b[36m"
 
 // Constantes
-#define TAM_CPF 15
+#define TAM_CPF 12
 #define TAM_NOME 100
 #define TAM_CARGO 50
-#define TAM_DATA 15
+#define TAM_DATA 11
 #define MAX_REGISTROS 100
 
-// Estrutura de registro
+// Estrutura de usuário (antigo registro)
 typedef struct
 {
     char cpf[TAM_CPF];
@@ -23,14 +23,21 @@ typedef struct
     char sobrenome[TAM_NOME];
     char cargo[TAM_CARGO];
     char dataNascimento[TAM_DATA];
-} Registro;
+} Usuario;
 
 // Protótipos
+void exibirTelaLogin();
 void exibirMenu();
-void registrarNomes();
-void consultarNomes();
-void deletarNomes();
+void registrarUsuarios();
+void consultarUsuarios();
+void deletarUsuarios();
 char validarContinuacao(const char *mensagem);
 void limparTela();
+
+// Novos protótipos de funções de validação
+int validarCPF(const char *cpf);
+int validarTexto(const char *texto);
+int validarData(const char *data);
+void formatarData(char *data);
 
 #endif
